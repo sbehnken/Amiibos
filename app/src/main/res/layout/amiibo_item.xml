@@ -4,46 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="5dp"
-    android:background="@color/cardview_dark_background">
+    android:background="@color/cardview_dark_background"
+    android:paddingTop="5dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginBottom="3dp"
         app:cardCornerRadius="10dp"
-        tools:ignore="MissingConstraints">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/amiibos_image_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="125dp"
-        android:layout_marginTop="5dp"
-        android:text="Amiibo Image" />
+        <ImageView
+            android:id="@+id/amiibos_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            android:layout_marginTop="5dp"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/amiibo_name_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="Amiboo Name"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="2dp"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:layout_marginBottom="2dp"
-            android:layout_gravity="bottom" />
+            tools:text="Amiboo Name" />
 
         <TextView
+            android:id="@+id/purchase_indicator_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/purchase_indicator"
-            android:layout_marginRight="5dp"
-            android:layout_gravity="bottom|right"
-            android:text="$$"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="5dp"
+            android:text="@string/purchase_indicator"
             android:textColor="@android:color/holo_green_dark"
-            />
+            android:visibility="invisible" />
 
     </androidx.cardview.widget.CardView>
 

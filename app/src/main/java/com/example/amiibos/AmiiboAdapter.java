@@ -13,10 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.amiibos.Models.Amiibo_;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.amiibos.Statics.AMIIBO_ITEM;
+import static com.example.amiibos.Statics.SHARED_PREFS;
 
 public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboViewHolder> {
 
@@ -24,15 +28,6 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
     private List<Amiibo_> amiibos = new ArrayList<>();
 
     private SharedPreferences sharedPreferences;
-    public static final String SHARED_PREFS = "sharedPrefs";
-
-    public void setAmiibos(List<Amiibo_> amiibos) {
-        this.amiibos = amiibos;
-    }
-
-    public List<Amiibo_> getAmiibos() {
-        return amiibos;
-    }
 
     public AmiiboAdapter(Context context) {
         this.context = context;
@@ -48,18 +43,7 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
 
     @Override
     public void onBindViewHolder(@NonNull AmiiboViewHolder holder, int position) {
-        Amiibo_ currentItem = amiibos.get(position);
-
-        String imageUrl = currentItem.getImage();
-        String amiiboName = currentItem.getCharacter();
-
-        if (sharedPreferences.getBoolean(currentItem.getHead() + currentItem.getTail(), false)) {
-            holder.purchaseIndicator.setVisibility(View.VISIBLE);
-        } else {
-            holder.purchaseIndicator.setVisibility(View.INVISIBLE);
-        }
-        holder.amiiboName.setText(amiiboName);
-        Picasso.with(context).load(imageUrl).fit().centerInside().into(holder.amiiboImageView);
+        holder.bind(amiibos.get(position));
     }
 
     @Override
@@ -67,17 +51,36 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         return amiibos.size();
     }
 
+
+    public void setAmiibos(List<Amiibo_> amiibos) {
+        this.amiibos = amiibos;
+    }
+
+    public List<Amiibo_> getAmiibos() {
+        return amiibos;
+    }
+
     public class AmiiboViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView amiiboImageView;
-        private TextView amiiboName;
+        private TextView amiiboCharacter;
         private TextView purchaseIndicator;
 
         public AmiiboViewHolder(@NonNull View itemView) {
             super(itemView);
-            amiiboImageView = itemView.findViewById(R.id.amiibos_image_text_view);
-            amiiboName = itemView.findViewById(R.id.amiibo_name_text_view);
-            purchaseIndicator = itemView.findViewById(R.id.purchase_indicator);
+            amiiboImageView = itemView.findViewById(R.id.amiibos_image_view);
+            amiiboCharacter = itemView.findViewById(R.id.amiibo_name_text_view);
+            purchaseIndicator = itemView.findViewById(R.id.purchase_indicator_text_view);
             itemView.setOnClickListener(this);
+        }
+
+        public void bind(Amiibo_ amiibo) {
+            if (sharedPreferences.getBoolean(amiibo.getHead() + amiibo.getTail(), false)) {
+                purchaseIndicator.setVisibility(View.VISIBLE);
+            } else {
+                purchaseIndicator.setVisibility(View.INVISIBLE);
+            }
+            amiiboCharacter.setText(amiibo.getCharacter());
+            Picasso.with(context).load(amiibo.getImage()).fit().centerInside().into(amiiboImageView);
         }
 
         @Override
@@ -85,13 +88,9 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
             int itemPosition = getLayoutPosition();
             final Amiibo_ currentItem = amiibos.get(itemPosition);
 
+            Gson gson = new Gson();
             Intent intent = new Intent(context, AmiiboDetailsActivity.class);
-            intent.putExtra("amiibo_series", currentItem.getAmiiboSeries());
-            intent.putExtra("character", currentItem.getCharacter());
-            intent.putExtra("game_series", currentItem.getGameSeries());
-            intent.putExtra("head", currentItem.getHead());
-            intent.putExtra("tail", currentItem.getTail());
-            intent.putExtra("type", currentItem.getType());
+            intent.putExtra(AMIIBO_ITEM, gson.toJson(currentItem));
             context.startActivity(intent);
         }
     }

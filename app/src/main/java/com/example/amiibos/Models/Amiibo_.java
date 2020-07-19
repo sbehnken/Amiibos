@@ -3,7 +3,9 @@ package com.example.amiibos.Models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Amiibo_ {
+import java.io.Serializable;
+
+public class Amiibo_ implements Serializable {
 
     @SerializedName("amiiboSeries")
     @Expose

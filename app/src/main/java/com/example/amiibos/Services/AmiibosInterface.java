@@ -8,6 +8,6 @@ import retrofit2.http.GET;
 public interface AmiibosInterface {
 
     @GET("amiibo/")
-    Call<Amiibo> getAllAmiibo();
+    Call<Amiibo> getAllAmiibos();
 
 }

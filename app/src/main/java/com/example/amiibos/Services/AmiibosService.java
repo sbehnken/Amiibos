@@ -19,7 +19,7 @@ public class AmiibosService {
         amiibosInterface = retrofit.create(AmiibosInterface.class);
     }
 
-    public Call<Amiibo> getAllAmiibo() {
-        return amiibosInterface.getAllAmiibo();
+    public Call<Amiibo> getAllAmiibos() {
+        return amiibosInterface.getAllAmiibos();
     }
 }

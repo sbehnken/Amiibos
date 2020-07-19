@@ -4,25 +4,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.amiibos.Models.Amiibo;
+import com.example.amiibos.Models.Amiibo_;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
+
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.example.amiibos.Statics.AMIIBO_ITEM;
+import static com.example.amiibos.Statics.DELETE_KEY;
+import static com.example.amiibos.Statics.SHARED_PREFS;
 
 public class AmiiboDetailsActivity extends AppCompatActivity {
 
     private String head;
     private String tail;
+    private Button removePurchase;
+    private Button purchase;
 
     private SharedPreferences sharedPreferences;
-    public static final String SHARED_PREFS = "sharedPrefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,65 +41,70 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        final Button removePurchase = findViewById(R.id.unpurchase_button);
-        final Button purchase = findViewById(R.id.purchase_button);
+        removePurchase = findViewById(R.id.unpurchase_button);
+        purchase = findViewById(R.id.purchase_button);
 
-        ImageButton deleteAmiibo = findViewById(R.id.delete_amiibo);
+        setupUI();
 
-        TextView amiiboSeriesTv = findViewById(R.id.amiibo_series_text_view);
-        TextView characterTv = findViewById(R.id.amiibo_character_text_view);
-        TextView gameSeriesTv = findViewById(R.id.amiibo_game_series_view);
-        TextView typeTv = findViewById(R.id.amiibo_type_text_view);
+        setClickListeners();
+    }
 
-        Intent intent = getIntent();
-        String amiiboSeries = intent.getStringExtra("amiibo_series");
-        String character = intent.getStringExtra("character");
-        String gameSeries = intent.getStringExtra("game_series");
-        String type = intent.getStringExtra("type");
-        head = intent.getStringExtra("head");
-        tail = intent.getStringExtra("tail");
+    private void setupUI() {
+        TextView amiiboSeriesText = findViewById(R.id.amiibo_series_text_view);
+        TextView characterText = findViewById(R.id.amiibo_character_text_view);
+        TextView gameSeriesText = findViewById(R.id.amiibo_game_series_view);
+        TextView typeText = findViewById(R.id.amiibo_type_text_view);
+        ImageView characterImage = findViewById(R.id.amiibo_image_view);
 
-        amiiboSeriesTv.setText("Amiibo Series: " + amiiboSeries);
-        characterTv.setText("Character: " + character);
-        gameSeriesTv.setText("Game Series: " + gameSeries);
-        typeTv.setText("Type: " + type);
+        Gson gson = new Gson();
+        Amiibo_ amiibo = gson.fromJson(getIntent().getStringExtra(AMIIBO_ITEM), Amiibo_.class);
+        head = amiibo.getHead();
+        tail = amiibo.getTail();
 
+        Picasso.with(this).load(amiibo.getImage()).into(characterImage);
+        amiiboSeriesText.setText(getResources().getString(R.string.amiibo_series_label, amiibo.getAmiiboSeries()));
+        characterText.setText(getResources().getString(R.string.amiibo_character_label, amiibo.getCharacter()));
+        gameSeriesText.setText(getResources().getString(R.string.amiibo_game_series_label, amiibo.getGameSeries()));
+        typeText.setText(getResources().getString(R.string.amiibo_type_label, amiibo.getType()));
+    }
 
-        if (sharedPreferences.getBoolean(head + tail, false)) {
+    private void setClickListeners() {
+        Button deleteAmiibo = findViewById(R.id.delete_amiibo);
+
+        setIsPurchasedVisibility(sharedPreferences.getBoolean(head + tail, false));
+
+        removePurchase.setOnClickListener(v -> {
+            setIsPurchasedVisibility(false);
+            setAddToList(false);
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.remove_from_purchases_toast), Toast.LENGTH_SHORT).show();
+        });
+
+        purchase.setOnClickListener(v -> {
+            setIsPurchasedVisibility(true);
+            setAddToList(true);
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.purchase_toast), Toast.LENGTH_SHORT).show();
+        });
+
+        deleteAmiibo.setOnClickListener(view -> {
+            Set<String> deletedAmiibos = sharedPreferences.getStringSet(DELETE_KEY, new HashSet<>());
+            deletedAmiibos.add(head + tail);
+            sharedPreferences.edit().putStringSet(DELETE_KEY, deletedAmiibos).apply();
+
+            onBackPressed();
+        });
+    }
+
+    private void setIsPurchasedVisibility(boolean isPurchased) {
+        if (isPurchased) {
             removePurchase.setVisibility(View.VISIBLE);
             purchase.setVisibility(View.INVISIBLE);
         } else {
             removePurchase.setVisibility(View.INVISIBLE);
             purchase.setVisibility(View.VISIBLE);
         }
-
-        removePurchase.setOnClickListener(v -> {
-            removePurchase.setVisibility(View.INVISIBLE);
-            purchase.setVisibility(View.VISIBLE);
-            setAddToList(false);
-            Toast.makeText(getBaseContext(), "Removed from Purchases", Toast.LENGTH_SHORT).show();
-        });
-
-        purchase.setOnClickListener(v -> {
-            removePurchase.setVisibility(View.VISIBLE);
-            purchase.setVisibility(View.INVISIBLE);
-            setAddToList(true);
-            Toast.makeText(getBaseContext(), "Purchased", Toast.LENGTH_SHORT).show();
-        });
-
-        deleteAmiibo.setOnClickListener(view -> {
-            Set<String> deletedAmiibos = sharedPreferences.getStringSet("deleted", new HashSet<>());
-            deletedAmiibos.add(head + tail);
-            sharedPreferences.edit().putStringSet("deleted", deletedAmiibos).apply();
-
-            Log.d("unicorn", "Shared Pref updated with Set: " + deletedAmiibos);
-
-            onBackPressed();
-        });
     }
 
     public void setAddToList(boolean value) {
-        Log.d("unicorn", "Purchase saved to SharedPrefs");
         sharedPreferences.edit().putBoolean(head + tail, value).apply();
     }
 }
