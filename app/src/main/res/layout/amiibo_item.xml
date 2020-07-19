@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:background="@color/cardview_dark_background">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="3dp"
+        app:cardCornerRadius="10dp"
+        tools:ignore="MissingConstraints">
+
+    <ImageView
+        android:id="@+id/amiibos_image_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_marginTop="5dp"
+        android:text="Amiibo Image" />
+
+        <TextView
+            android:id="@+id/amiibo_name_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="Amiboo Name"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="2dp"
+            android:layout_gravity="bottom" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/purchase_indicator"
+            android:layout_marginRight="5dp"
+            android:layout_gravity="bottom|right"
+            android:text="$$"
+            android:textColor="@android:color/holo_green_dark"
+            />
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
