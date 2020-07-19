@@ -26,22 +26,22 @@ import static com.example.amiibos.AmiiboAdapter.SHARED_PREFS;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AmiiboAdapter mAdapter;
-    private SharedPreferences mSharedPreferences;
+    private AmiiboAdapter adapter;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         final int columns = getResources().getInteger(R.integer.gallery_columns);
 
         RecyclerView mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, columns));
-        mAdapter = new AmiiboAdapter(this);
-        mRecyclerView.setAdapter(mAdapter);
+        adapter = new AmiiboAdapter(this);
+        mRecyclerView.setAdapter(adapter);
 
         getAmiiboResponse();
     }
@@ -54,15 +54,14 @@ public class MainActivity extends AppCompatActivity {
                 if (response.code() == 400 || response.code() == 403) {
                     Toast.makeText(MainActivity.this, "404 Site not found", Toast.LENGTH_SHORT).show();
                 } else {
-//                    mSharedPreferences.edit().clear().apply();
-                    mAdapter.setmAmiibosList((ArrayList) response.body().getAmiibo());
+                    adapter.setAmiibos(response.body().getAmiibo());
 
-                    final Set<String> deletedAmiibo = mSharedPreferences.getStringSet("deleted", new HashSet<>());
-                    Log.d("unicorn", "Deleted Amiibos in Shared Pref: getAmiiboResponse" + deletedAmiibo);
-                    mAdapter.getmAmiibosList().removeIf(
-                            amiibo_ -> deletedAmiibo.contains(amiibo_.getHead() + amiibo_.getTail()));
+                    Set<String> deletedAmiibos = sharedPreferences.getStringSet("deleted", new HashSet<>());
+                    Log.d("unicorn", "Deleted Amiibos in Shared Pref: getAmiiboResponse" + deletedAmiibos);
+                    adapter.getAmiibos().removeIf(
+                            amiibo_ -> deletedAmiibos.contains(amiibo_.getHead() + amiibo_.getTail()));
 
-                    mAdapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -76,13 +75,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        final Set<String> deletedAmiibo = mSharedPreferences.getStringSet("deleted", new HashSet<>());
+        final Set<String> deletedAmiibo = sharedPreferences.getStringSet("deleted", new HashSet<>());
         Log.d("unicorn", "onResume - Deleted Amiibos in Shared Pref: " + deletedAmiibo);
-        mAdapter.getmAmiibosList().removeIf(
+        adapter.getAmiibos().removeIf(
                 (Amiibo_ amiibo) -> {
                     return deletedAmiibo.contains(amiibo.getHead() + amiibo.getTail());
                 });
 
-        mAdapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
     }
 }

@@ -16,82 +16,83 @@ import com.example.amiibos.Models.Amiibo_;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboViewHolder> {
 
-    private Context mContext;
-    private ArrayList<Amiibo_> mAmiibosList = new ArrayList<>();
+    private Context context;
+    private List<Amiibo_> amiibos = new ArrayList<>();
 
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences sharedPreferences;
     public static final String SHARED_PREFS = "sharedPrefs";
 
-    public void setmAmiibosList(ArrayList<Amiibo_> mAmiibosList) {
-        this.mAmiibosList = mAmiibosList;
+    public void setAmiibos(List<Amiibo_> amiibos) {
+        this.amiibos = amiibos;
     }
 
-    public ArrayList<Amiibo_> getmAmiibosList() {
-        return mAmiibosList;
+    public List<Amiibo_> getAmiibos() {
+        return amiibos;
     }
 
     public AmiiboAdapter(Context context) {
-        this.mContext = context;
-        this.mSharedPreferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        this.context = context;
+        this.sharedPreferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @NonNull
     @Override
     public AmiiboViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.amiibo_item, viewGroup, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.amiibo_item, viewGroup, false);
         return new AmiiboViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AmiiboViewHolder holder, int position) {
-        Amiibo_ currentItem = mAmiibosList.get(position);
+        Amiibo_ currentItem = amiibos.get(position);
 
         String imageUrl = currentItem.getImage();
         String amiiboName = currentItem.getCharacter();
 
-        if (mSharedPreferences.getBoolean(currentItem.getHead() + currentItem.getTail(), false)) {
-            holder.mPurchaseIndicator.setVisibility(View.VISIBLE);
+        if (sharedPreferences.getBoolean(currentItem.getHead() + currentItem.getTail(), false)) {
+            holder.purchaseIndicator.setVisibility(View.VISIBLE);
         } else {
-            holder.mPurchaseIndicator.setVisibility(View.INVISIBLE);
+            holder.purchaseIndicator.setVisibility(View.INVISIBLE);
         }
-        holder.mAmiiboName.setText(amiiboName);
-        Picasso.with(mContext).load(imageUrl).fit().centerInside().into(holder.mAmiiboImageView);
+        holder.amiiboName.setText(amiiboName);
+        Picasso.with(context).load(imageUrl).fit().centerInside().into(holder.amiiboImageView);
     }
 
     @Override
     public int getItemCount() {
-        return mAmiibosList.size();
+        return amiibos.size();
     }
 
     public class AmiiboViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView mAmiiboImageView;
-        private TextView mAmiiboName;
-        private TextView mPurchaseIndicator;
+        private ImageView amiiboImageView;
+        private TextView amiiboName;
+        private TextView purchaseIndicator;
 
         public AmiiboViewHolder(@NonNull View itemView) {
             super(itemView);
-            mAmiiboImageView = itemView.findViewById(R.id.amiibos_image_text_view);
-            mAmiiboName = itemView.findViewById(R.id.amiibo_name_text_view);
-            mPurchaseIndicator = itemView.findViewById(R.id.purchase_indicator);
+            amiiboImageView = itemView.findViewById(R.id.amiibos_image_text_view);
+            amiiboName = itemView.findViewById(R.id.amiibo_name_text_view);
+            purchaseIndicator = itemView.findViewById(R.id.purchase_indicator);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             int itemPosition = getLayoutPosition();
-            final Amiibo_ currentItem = mAmiibosList.get(itemPosition);
+            final Amiibo_ currentItem = amiibos.get(itemPosition);
 
-            Intent intent = new Intent(mContext, AmiiboDetailsActivity.class);
+            Intent intent = new Intent(context, AmiiboDetailsActivity.class);
             intent.putExtra("amiibo_series", currentItem.getAmiiboSeries());
             intent.putExtra("character", currentItem.getCharacter());
             intent.putExtra("game_series", currentItem.getGameSeries());
             intent.putExtra("head", currentItem.getHead());
             intent.putExtra("tail", currentItem.getTail());
             intent.putExtra("type", currentItem.getType());
-            mContext.startActivity(intent);
+            context.startActivity(intent);
         }
     }
 }

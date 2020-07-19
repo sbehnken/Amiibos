@@ -21,7 +21,7 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
     private String head;
     private String tail;
 
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences sharedPreferences;
     public static final String SHARED_PREFS = "sharedPrefs";
 
     @Override
@@ -29,10 +29,10 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amiibo_details);
 
-        mSharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        final Button mRemovePurchase = findViewById(R.id.unpurchase_button);
-        final Button mPurchase = findViewById(R.id.purchase_button);
+        final Button removePurchase = findViewById(R.id.unpurchase_button);
+        final Button purchase = findViewById(R.id.purchase_button);
 
         ImageButton deleteAmiibo = findViewById(R.id.delete_amiibo);
 
@@ -55,44 +55,34 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
         typeTv.setText("Type: " + type);
 
 
-        if (mSharedPreferences.getBoolean(head + tail, false)) {
-            mRemovePurchase.setVisibility(View.VISIBLE);
-            mPurchase.setVisibility(View.INVISIBLE);
+        if (sharedPreferences.getBoolean(head + tail, false)) {
+            removePurchase.setVisibility(View.VISIBLE);
+            purchase.setVisibility(View.INVISIBLE);
         } else {
-            mRemovePurchase.setVisibility(View.INVISIBLE);
-            mPurchase.setVisibility(View.VISIBLE);
+            removePurchase.setVisibility(View.INVISIBLE);
+            purchase.setVisibility(View.VISIBLE);
         }
 
-        mRemovePurchase.setOnClickListener(v -> {
-            mRemovePurchase.setVisibility(View.INVISIBLE);
-            mPurchase.setVisibility(View.VISIBLE);
+        removePurchase.setOnClickListener(v -> {
+            removePurchase.setVisibility(View.INVISIBLE);
+            purchase.setVisibility(View.VISIBLE);
             setAddToList(false);
             Toast.makeText(getBaseContext(), "Removed from Purchases", Toast.LENGTH_SHORT).show();
         });
 
-        mPurchase.setOnClickListener(v -> {
-            mRemovePurchase.setVisibility(View.VISIBLE);
-            mPurchase.setVisibility(View.INVISIBLE);
+        purchase.setOnClickListener(v -> {
+            removePurchase.setVisibility(View.VISIBLE);
+            purchase.setVisibility(View.INVISIBLE);
             setAddToList(true);
             Toast.makeText(getBaseContext(), "Purchased", Toast.LENGTH_SHORT).show();
-
-            final Set<String> purchasedAmiibos = mSharedPreferences.getStringSet("purchased", new HashSet<>());
-            Set<String> copy = new HashSet<>(purchasedAmiibos);
-            copy.add(head + tail);
-            mSharedPreferences.edit().putStringSet("purchased", copy).apply();
         });
 
         deleteAmiibo.setOnClickListener(view -> {
-            final Set<String> deletedAmiibo = mSharedPreferences.getStringSet("deleted", new HashSet<>());
-            Set<String> copy = new HashSet<>(deletedAmiibo);
+            Set<String> deletedAmiibos = sharedPreferences.getStringSet("deleted", new HashSet<>());
+            deletedAmiibos.add(head + tail);
+            sharedPreferences.edit().putStringSet("deleted", deletedAmiibos).apply();
 
-            //different way of doing it
-//                Set<String> copy = new HashSet<>(mSharedPreferences.getStringSet("deleted", new HashSet<>()));
-
-            copy.add(head + tail);
-            mSharedPreferences.edit().putStringSet("deleted", copy).apply();
-
-            Log.d("unicorn", "Shared Pref updated with Set: " + copy);
+            Log.d("unicorn", "Shared Pref updated with Set: " + deletedAmiibos);
 
             onBackPressed();
         });
@@ -100,6 +90,6 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
 
     public void setAddToList(boolean value) {
         Log.d("unicorn", "Purchase saved to SharedPrefs");
-        mSharedPreferences.edit().putBoolean(head + tail, value).apply();
+        sharedPreferences.edit().putBoolean(head + tail, value).apply();
     }
 }
