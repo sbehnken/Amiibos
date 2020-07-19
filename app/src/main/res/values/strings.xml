@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Amiibos</string>
     <string name="amiibo_series_label">Amiibo Series: %s</string>
-    <string name="amiibo_character_label">Character %s</string>
+    <string name="amiibo_character_label">Character: %s</string>
     <string name="amiibo_game_series_label">Game Series: %s</string>
     <string name="amiibo_type_label">Type: %s</string>
     <string name="remove_from_purchases_toast">Removed from Purchases</string>
