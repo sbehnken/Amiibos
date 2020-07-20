@@ -51,7 +51,6 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         return amiibos.size();
     }
 
-
     public void setAmiibos(List<Amiibo_> amiibos) {
         this.amiibos = amiibos;
     }
@@ -86,7 +85,7 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         @Override
         public void onClick(View view) {
             int itemPosition = getLayoutPosition();
-            final Amiibo_ currentItem = amiibos.get(itemPosition);
+            Amiibo_ currentItem = amiibos.get(itemPosition);
 
             Gson gson = new Gson();
             Intent intent = new Intent(context, AmiiboDetailsActivity.class);
