@@ -20,6 +20,7 @@ import java.util.Set;
 
 import static com.example.amiibos.Statics.AMIIBO_ITEM;
 import static com.example.amiibos.Statics.DELETE_KEY;
+import static com.example.amiibos.Statics.PURCHASED_KEY;
 import static com.example.amiibos.Statics.SHARED_PREFS;
 
 public class AmiiboDetailsActivity extends AppCompatActivity {
@@ -54,7 +55,8 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
         ImageView characterImage = findViewById(R.id.amiibo_image_view);
 
         Gson gson = new Gson();
-        Amiibo_ amiibo = gson.fromJson(getIntent().getStringExtra(AMIIBO_ITEM), Amiibo_.class);
+        String jsonString = getIntent().getStringExtra(AMIIBO_ITEM);
+        Amiibo_ amiibo = gson.fromJson(jsonString, Amiibo_.class);
         head = amiibo.getHead();
         tail = amiibo.getTail();
 
@@ -68,17 +70,18 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
     private void setClickListeners() {
         Button deleteAmiibo = findViewById(R.id.delete_amiibo);
 
-        setIsPurchasedVisibility(sharedPreferences.getBoolean(head + tail, false));
+        Set<String> purchasedAmiibos = sharedPreferences.getStringSet(PURCHASED_KEY, new HashSet<>());
+        setIsPurchasedVisibility(purchasedAmiibos.contains(head + tail));
 
         removePurchase.setOnClickListener(v -> {
             setIsPurchasedVisibility(false);
-            setAddToList(false);
+            updateIsPurchased(false);
             Toast.makeText(getBaseContext(), getResources().getString(R.string.remove_from_purchases_toast), Toast.LENGTH_SHORT).show();
         });
 
         purchase.setOnClickListener(v -> {
             setIsPurchasedVisibility(true);
-            setAddToList(true);
+            updateIsPurchased(true);
             Toast.makeText(getBaseContext(), getResources().getString(R.string.purchase_toast), Toast.LENGTH_SHORT).show();
         });
 
@@ -101,7 +104,13 @@ public class AmiiboDetailsActivity extends AppCompatActivity {
         }
     }
 
-    public void setAddToList(boolean value) {
-        sharedPreferences.edit().putBoolean(head + tail, value).apply();
+    public void updateIsPurchased(boolean value) {
+        Set<String> purchasedAmiibos = sharedPreferences.getStringSet(PURCHASED_KEY, new HashSet<>());
+        if(value) {
+            purchasedAmiibos.add(head + tail);
+        } else {
+            purchasedAmiibos.remove(head + tail);
+        }
+        sharedPreferences.edit().putStringSet(PURCHASED_KEY, purchasedAmiibos).apply();
     }
 }

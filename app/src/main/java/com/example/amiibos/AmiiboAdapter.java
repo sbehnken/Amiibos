@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.example.amiibos.Statics.AMIIBO_ITEM;
 import static com.example.amiibos.Statics.SHARED_PREFS;
@@ -26,12 +27,10 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
 
     private Context context;
     private List<Amiibo_> amiibos = new ArrayList<>();
-
-    private SharedPreferences sharedPreferences;
+    private Set<String> purchased;
 
     public AmiiboAdapter(Context context) {
         this.context = context;
-        this.sharedPreferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @NonNull
@@ -51,10 +50,13 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         return amiibos.size();
     }
 
-    public void setAmiibos(List<Amiibo_> amiibos) {
-        this.amiibos = amiibos;
+    public void setAmiibosData(List<Amiibo_> amiibos, Set<String> purchased, Set<String> deleted) {
+        this.purchased = purchased;
+        List<Amiibo_> filteredAmiibos = new ArrayList<>(amiibos);
+        filteredAmiibos.removeIf(
+                amiibo_ -> deleted.contains(amiibo_.getHead() + amiibo_.getTail()));
+        this.amiibos = filteredAmiibos;
     }
-
     public List<Amiibo_> getAmiibos() {
         return amiibos;
     }
@@ -73,7 +75,7 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         }
 
         public void bind(Amiibo_ amiibo) {
-            if (sharedPreferences.getBoolean(amiibo.getHead() + amiibo.getTail(), false)) {
+            if (purchased.contains(amiibo.getHead() + amiibo.getTail())) {
                 purchaseIndicator.setVisibility(View.VISIBLE);
             } else {
                 purchaseIndicator.setVisibility(View.INVISIBLE);

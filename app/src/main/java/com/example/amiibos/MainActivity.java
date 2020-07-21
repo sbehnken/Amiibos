@@ -24,6 +24,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.amiibos.Statics.DELETE_KEY;
+import static com.example.amiibos.Statics.PURCHASED_KEY;
 import static com.example.amiibos.Statics.SHARED_PREFS;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,11 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateAdapter(List<Amiibo_> amiibos) {
         Set<String> deletedAmiibos = sharedPreferences.getStringSet(DELETE_KEY, new HashSet<>());
-        //Filtering out deleted items from response
-        List<Amiibo_> filteredAmiibos = new ArrayList<>(amiibos);
-        filteredAmiibos.removeIf(
-                amiibo_ -> deletedAmiibos.contains(amiibo_.getHead() + amiibo_.getTail()));
-        adapter.setAmiibos(filteredAmiibos);
+        Set<String> purchasedAmiibos = sharedPreferences.getStringSet(PURCHASED_KEY, new HashSet<>());
+        adapter.setAmiibosData(amiibos, purchasedAmiibos, deletedAmiibos);
         adapter.notifyDataSetChanged();
     }
 
