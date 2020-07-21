@@ -50,13 +50,11 @@ public class AmiiboAdapter extends RecyclerView.Adapter<AmiiboAdapter.AmiiboView
         return amiibos.size();
     }
 
-    public void setAmiibosData(List<Amiibo_> amiibos, Set<String> purchased, Set<String> deleted) {
+    public void setAmiibosData(List<Amiibo_> amiibos, Set<String> purchased) {
         this.purchased = purchased;
-        List<Amiibo_> filteredAmiibos = new ArrayList<>(amiibos);
-        filteredAmiibos.removeIf(
-                amiibo_ -> deleted.contains(amiibo_.getHead() + amiibo_.getTail()));
-        this.amiibos = filteredAmiibos;
+        this.amiibos = amiibos;
     }
+
     public List<Amiibo_> getAmiibos() {
         return amiibos;
     }

@@ -50,9 +50,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateAdapter(List<Amiibo_> amiibos) {
+        // Getting deleted and purchased sets
         Set<String> deletedAmiibos = sharedPreferences.getStringSet(DELETE_KEY, new HashSet<>());
         Set<String> purchasedAmiibos = sharedPreferences.getStringSet(PURCHASED_KEY, new HashSet<>());
-        adapter.setAmiibosData(amiibos, purchasedAmiibos, deletedAmiibos);
+        List<Amiibo_> filteredAmiibos = new ArrayList<>(amiibos);
+        // Filtering out the removed items
+        filteredAmiibos.removeIf(
+                amiibo_ -> deletedAmiibos.contains(amiibo_.getHead() + amiibo_.getTail()));
+        // Setting filtered items and the purchased set for display
+        adapter.setAmiibosData(filteredAmiibos, purchasedAmiibos);
         adapter.notifyDataSetChanged();
     }
 
